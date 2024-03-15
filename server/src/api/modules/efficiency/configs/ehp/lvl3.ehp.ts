@@ -6,48 +6,48 @@ export default [
     methods: [
       {
         startExp: 0,
-        rate: 40_000,
-        description: 'Shrimp & Trout'
+        rate: 171_000,
+        description: '1t poison karambwan'
       },
       {
         startExp: 13_363,
-        rate: 463_867,
-        description: '1t Karambwans'
+        rate: 513_800,
+        description: '1t karambwan'
       },
       {
         startExp: 37_224,
-        rate: 534_375,
-        description: '1t Karambwans'
+        rate: 585_600,
+        description: '1t karambwan'
       },
       {
         startExp: 101_333,
-        rate: 604_883,
-        description: '1t Karambwans'
+        rate: 656_800,
+        description: '1t karambwan'
       },
       {
         startExp: 273_742,
-        rate: 671_680,
-        description: '1t Karambwans'
+        rate: 728_200,
+        description: '1t karambwan'
       },
       {
         startExp: 737_627,
-        rate: 742_188,
-        description: '1t Karambwans'
+        rate: 799_800,
+        description: '1t karambwan'
       },
       {
         startExp: 1_986_068,
-        rate: 812_695,
-        description: '1t Karambwans'
+        rate: 871_400,
+        description: '1t karambwan'
       },
       {
         startExp: 5_346_332,
-        rate: 883_203,
-        description: '1t Karambwans'
+        rate: 938_400,
+        description: '1t karambwan'
       },
       {
         startExp: 13_034_431,
-        rate: 950_000,
-        description: '1t Karambwans'
+        rate: 970_000,
+        description: '1t karambwan'
       }
     ],
     bonuses: []
@@ -228,27 +228,47 @@ export default [
     methods: [
       {
         startExp: 0,
-        rate: 57_000,
-        description: 'Leather & Gems'
+        rate: 36_600,
+        description: 'Leather items'
+      },
+      {
+        startExp: 4_470,
+        rate: 139_000,
+        description: 'Sapphires'
+      },
+      {
+        startExp: 9_730,
+        rate: 187_650,
+        description: 'Emeralds'
+      },
+      {
+        startExp: 20_224,
+        rate: 236_300,
+        description: 'Rubies'
+      },
+      {
+        startExp: 50_339,
+        rate: 298_850,
+        description: 'Diamonds'
       },
       {
         startExp: 368_599,
-        rate: 320_000,
+        rate: 324_420,
         description: "Green d'hide bodies"
       },
       {
         startExp: 814_445,
-        rate: 360_000,
+        rate: 366_280,
         description: "Blue d'hide bodies"
       },
       {
         startExp: 1_475_581,
-        rate: 400_000,
+        rate: 408_140,
         description: "Red d'hide bodies"
       },
       {
         startExp: 2_951_373,
-        rate: 440_000,
+        rate: 450_000,
         description: "Black d'hide bodies"
       }
     ],
@@ -366,7 +386,7 @@ export default [
       {
         startExp: 0,
         rate: 6_000,
-        description: 'Questing XP'
+        description: 'Quests'
       },
       {
         startExp: 3_000,
@@ -384,9 +404,34 @@ export default [
         description: 'Super attack potions'
       },
       {
+        startExp: 123_660,
+        rate: 293_750,
+        description: 'Super energies'
+      },
+      {
+        startExp: 166_636,
+        rate: 312_500,
+        description: 'Super strengths'
+      },
+      {
         startExp: 368_599,
         rate: 356_250,
-        description: 'Super restore potions'
+        description: 'Super restores'
+      },
+      {
+        startExp: 496_254,
+        rate: 375_000,
+        description: 'Super defences'
+      },
+      {
+        startExp: 668_051,
+        rate: 393_750,
+        description: 'Antifire potions'
+      },
+      {
+        startExp: 899_257,
+        rate: 406_250,
+        description: 'Ranging potions'
       },
       {
         startExp: 1_336_443,
@@ -394,9 +439,14 @@ export default [
         description: 'Magic potions'
       },
       {
-        startExp: 2_192_818,
-        rate: 450_000,
-        description: 'Saradomin brews'
+        startExp: 1_475_581,
+        rate: 535_500,
+        description: '1t stamina potions'
+      },
+      {
+        startExp: 3_972_294,
+        rate: 630_000,
+        description: '1t anti-venoms'
       }
     ],
     bonuses: []
@@ -514,32 +564,52 @@ export default [
     methods: [
       {
         startExp: 0,
-        rate: 10_000,
-        description: 'Bagged plants'
+        rate: 24_000,
+        description: 'Quests, bagged plants, and low-level trees'
       },
       {
-        startExp: 2_411,
-        rate: 50_000,
-        description: 'Tree runs'
-      },
-      {
-        startExp: 13_363,
-        rate: 80_000,
+        startExp: 17_470,
+        rate: 288_000,
         description: 'Tree runs'
       },
       {
         startExp: 61_512,
-        rate: 150_000,
+        rate: 498_000,
+        description: 'Tree runs'
+      },
+      {
+        startExp: 166_636,
+        rate: 679_000,
         description: 'Tree runs'
       },
       {
         startExp: 273_742,
-        rate: 350_000,
+        rate: 1_045_000,
+        description: 'Tree runs'
+      },
+      {
+        startExp: 605_032,
+        rate: 1_261_000,
         description: 'Tree runs'
       },
       {
         startExp: 1_210_421,
-        rate: 1_900_000,
+        rate: 1_875_000,
+        description: 'Tree runs'
+      },
+      {
+        startExp: 2_192_818,
+        rate: 2_167_000,
+        description: 'Tree runs'
+      },
+      {
+        startExp: 3_258_594,
+        rate: 2_265_000,
+        description: 'Tree runs'
+      },
+      {
+        startExp: 5_346_332,
+        rate: 2_300_000,
         description: 'Tree runs'
       }
     ],
@@ -550,13 +620,28 @@ export default [
     methods: [
       {
         startExp: 0,
-        rate: 8_000,
-        description: 'Questing XP & Earth runes'
+        rate: 10_710,
+        description: 'Quests'
       },
       {
-        startExp: 6_291,
-        rate: 230_000,
-        description: '0+4 Lava runes'
+        startExp: 10_710,
+        rate: 95_000,
+        description: 'No Pouch Duo Lavas'
+      },
+      {
+        startExp: 3_258_594,
+        rate: 50_000,
+        description: 'GotR small teams'
+      },
+      {
+        startExp: 3_883_594,
+        rate: 95_000,
+        description: 'No Pouch Duo Lavas'
+      },
+      {
+        startExp: 13_034_431,
+        rate: 145_000,
+        description: 'Colossal Pouch Duo Lavas'
       }
     ],
     bonuses: []
@@ -633,17 +718,17 @@ export default [
     methods: [
       {
         startExp: 0,
-        rate: 100_000,
-        description: 'Oak chairs'
+        rate: 54_700,
+        description: 'Low-level furniture'
       },
       {
         startExp: 18_247,
-        rate: 480_000,
+        rate: 450_000,
         description: 'Oak larders'
       },
       {
         startExp: 123_660,
-        rate: 935_000,
+        rate: 950_000,
         description: 'Mahogany tables'
       },
       {

@@ -6,8 +6,18 @@ export default [
     methods: [
       {
         startExp: 0,
+        rate: 100_000,
+        description: '1t beef'
+      },
+      {
+        startExp: 22_406,
+        rate: 450_000,
+        description: 'Wines (avg rate with failures)'
+      },
+      {
+        startExp: 605_032,
         rate: 500_000,
-        description: 'wines'
+        description: 'Wines'
       }
     ],
     bonuses: []
@@ -138,7 +148,7 @@ export default [
       },
       {
         startExp: 13_363,
-        rate: 130_000,
+        rate: 130_500,
         description: 'Best Logs @ GE'
       },
       {
