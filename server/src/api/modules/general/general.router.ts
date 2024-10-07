@@ -6,6 +6,7 @@ import { createAPIKey } from './services/CreateAPIKeyService';
 import { fetchTableCounts } from './services/FetchTableCountsService';
 import { blockUserActions } from './services/BlockUserActionsService';
 import { allowUserActions } from './services/AllowUserActionsService';
+import { fetchMetrics } from './services/FetchMetricsService';
 
 const router = Router();
 
@@ -59,6 +60,14 @@ router.post(
   executeRequest(async (req, res) => {
     await allowUserActions(req.body.ipHash);
     res.status(200).json(true);
+  })
+);
+
+router.get(
+  '/metrics',
+  executeRequest(async (_, res) => {
+    const stats = await fetchMetrics();
+    res.status(200).json(stats);
   })
 );
 
