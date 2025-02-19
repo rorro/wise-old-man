@@ -103,6 +103,10 @@ class EfficiencyAlgorithm {
         const startBonusesReset = this.calculateBonusExp(resetStats, BonusType.START);
         const endBonusesReset = this.calculateBonusExp(resetStats, BonusType.END);
 
+        if (originSkill === Skill.CRAFTING && bonusSkill === Skill.MAGIC) {
+          console.log(startBonusesReset, endBonusesReset);
+        }
+
         const startExpReset = resetStats.get(bonusSkill)! + startBonusesReset.get(bonusSkill)!;
         const endExpReset = MAX_SKILL_EXP - endBonusesReset.get(bonusSkill)!;
 
@@ -193,8 +197,25 @@ class EfficiencyAlgorithm {
         const originStart =
           Math.max(stats.get(b.originSkill)!, b.startExp) + (isStart ? map.get(b.originSkill)! : 0);
 
-        const originEnd = !isStart ? expCap - map.get(b.originSkill)! : expCap;
+        const originEnd = !isStart && expCap === MAX_SKILL_EXP ? expCap - map.get(b.originSkill)! : expCap;
         const bonusToApply = Math.max(0, originEnd - originStart) * b.ratio;
+
+        if (
+          !isStart &&
+          b.originSkill === Skill.SMITHING &&
+          b.bonusSkill === Skill.MAGIC &&
+          this.type === EfficiencyAlgorithmType.F2P_IRONMAN
+        ) {
+          console.log(b);
+          console.log(
+            `Math.max(${stats.get(b.originSkill)!}, ${b.startExp}) + ${isStart} ? ${map.get(b.originSkill)!} : 0 = ${originStart}`
+          );
+
+          console.log(`expCap: ${expCap}`);
+          console.log(`originStart: ${originStart}`);
+          console.log(`originEnd: ${originEnd}`);
+          console.log(`bonusToApply: ${bonusToApply}`);
+        }
 
         map.set(b.bonusSkill, Math.min(MAX_SKILL_EXP, map.get(b.bonusSkill)! + bonusToApply));
       });
@@ -314,6 +335,10 @@ class EfficiencyAlgorithm {
 
     const totalEHP = Array.from(map.values()).reduce((a, b) => a + b, 0);
     map.set(Skill.OVERALL, totalEHP);
+
+    if (this.type === EfficiencyAlgorithmType.F2P_IRONMAN) {
+      console.log(endBonusExp);
+    }
 
     return map;
   }

@@ -316,10 +316,10 @@ export default [
       {
         originSkill: Skill.RANGED,
         bonusSkill: Skill.PRAYER,
-        startExp: 37_224,
+        startExp: 0,
         endExp: 13_034_431,
         end: true,
-        ratio: 0.131
+        ratio: 0.13
       },
       {
         originSkill: Skill.RANGED,
@@ -375,6 +375,11 @@ export default [
         startExp: 33_648,
         rate: 43_500,
         description: 'Fire bolt moss giants'
+      },
+      {
+        startXp: 247_886,
+        rate: 64_000,
+        description: 'Fire bolt moss giants'
       }
     ],
     bonuses: [
@@ -382,9 +387,17 @@ export default [
         originSkill: Skill.MAGIC,
         bonusSkill: Skill.PRAYER,
         startExp: 33_648,
-        endExp: 200_000_000,
+        endExp: 247_886,
         end: true,
         ratio: 0.0516
+      },
+      {
+        originSkill: Skill.MAGIC,
+        bonusSkill: Skill.PRAYER,
+        startExp: 247_886,
+        endExp: 200_000_000,
+        end: true,
+        ratio: 0.0472
       }
     ]
   },
@@ -537,6 +550,11 @@ export default [
         startExp: 50_339,
         rate: 65_000,
         description: 'Willow logs from Woodcutting (100% fm success)'
+      },
+      {
+        startExp: 273_742,
+        rate: 70_000,
+        description: '2t yews + fm'
       }
     ],
     bonuses: [
@@ -544,9 +562,17 @@ export default [
         originSkill: Skill.FIREMAKING,
         bonusSkill: Skill.WOODCUTTING,
         startExp: 13_363,
-        endExp: 200_000_000,
+        endExp: 273_742,
         end: true,
         ratio: 0.75
+      },
+      {
+        originSkill: Skill.FIREMAKING,
+        bonusSkill: Skill.WOODCUTTING,
+        startExp: 273_742,
+        endExp: 200_000_000,
+        end: true,
+        ratio: 0.8642
       }
     ]
   },
