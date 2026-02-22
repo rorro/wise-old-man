@@ -1,6 +1,6 @@
 import prisma from '../../../../prisma';
 import { NameChange, NameChangeStatus, PlayerAnnotationType } from '../../../../types';
-import { NotFoundError } from '../../../errors';
+import { ForbiddenError, NotFoundError } from '../../../errors';
 import { standardizeUsername } from '../../players/player.utils';
 
 async function findPlayerNameChanges(username: string): Promise<NameChange[]> {
