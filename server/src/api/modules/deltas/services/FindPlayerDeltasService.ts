@@ -1,7 +1,8 @@
+import { AsyncResult, complete, errored } from '@attio/fetchable';
 import prisma from '../../../../prisma';
 import { Period, PlayerAnnotationType } from '../../../../types';
 import { parsePeriodExpression } from '../../../../utils/shared/parse-period-expression.util';
-import { BadRequestError, ForbiddenError, NotFoundError } from '../../../errors';
+import { BadRequestError } from '../../../errors';
 import { PlayerDeltasMapResponse } from '../../../responses';
 import { standardizeUsername } from '../../players/player.utils';
 import { calculatePlayerDeltas, emptyPlayerDelta } from '../delta.utils';
@@ -11,11 +12,14 @@ async function findPlayerDeltas(
   period?: Period | string,
   minDate?: Date,
   maxDate?: Date
-): Promise<{
-  startsAt: Date | null;
-  endsAt: Date | null;
-  data: PlayerDeltasMapResponse;
-}> {
+): AsyncResult<
+  {
+    startsAt: Date | null;
+    endsAt: Date | null;
+    data: PlayerDeltasMapResponse;
+  },
+  { code: 'PLAYER_NOT_FOUND' } | { code: 'PLAYER_OPTED_OUT' }
+> {
   if (!period && (!minDate || !maxDate)) {
     throw new BadRequestError('Invalid period and start/end dates.');
   }
@@ -36,13 +40,12 @@ async function findPlayerDeltas(
     }
   });
 
-  //TODO: refactor error handling
   if (!player) {
-    throw new NotFoundError('Player not found.');
+    return errored({ code: 'PLAYER_NOT_FOUND' });
   }
 
   if (player.annotations.some(a => a.type === PlayerAnnotationType.OPT_OUT)) {
-    throw new ForbiddenError('Player has opted out.');
+    return errored({ code: 'PLAYER_OPTED_OUT' });
   }
 
   const startSnapshot = await prisma.snapshot.findFirst({
@@ -72,20 +75,20 @@ async function findPlayerDeltas(
 
   // Player was inactive during this period (no snapshots), return empty deltas
   if (!startSnapshot || !endSnapshot) {
-    return {
+    return complete({
       startsAt: null,
       endsAt: null,
       data: emptyPlayerDelta()
-    };
+    });
   }
 
   const data = calculatePlayerDeltas(startSnapshot, endSnapshot, player);
 
-  return {
+  return complete({
     startsAt: startSnapshot.createdAt,
     endsAt: endSnapshot.createdAt,
     data
-  };
+  });
 }
 
 function parseStartDate(period: Period | string | undefined, minDate?: Date): Date {

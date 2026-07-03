@@ -1,3 +1,4 @@
+import { AsyncResult, complete, errored } from '@attio/fetchable';
 import prisma from '../../../../prisma';
 import {
   Achievement,
@@ -9,21 +10,21 @@ import {
 import { omit } from '../../../../utils/omit.util';
 import { pick } from '../../../../utils/pick.util';
 import { roundNumber } from '../../../../utils/shared/round-number.util';
-import { ForbiddenError, NotFoundError } from '../../../errors';
 import { standardizeUsername } from '../../players/player.utils';
 import { LEGACY_TEMPLATE_NAMES } from '../achievement.templates';
 import { getAchievementDefinitions } from '../achievement.utils';
 
 const ALL_DEFINITIONS = getAchievementDefinitions();
 
-async function findPlayerAchievementProgress(username: string): Promise<
+async function findPlayerAchievementProgress(username: string): AsyncResult<
   Array<{
     achievement: Omit<Achievement, 'createdAt'>;
     createdAt: Date | null;
     currentValue: number;
     absoluteProgress: number;
     relativeProgress: number;
-  }>
+  }>,
+  { code: 'PLAYER_NOT_FOUND' } | { code: 'PLAYER_OPTED_OUT' }
 > {
   const player = await prisma.player.findFirst({
     where: {
@@ -35,13 +36,12 @@ async function findPlayerAchievementProgress(username: string): Promise<
     }
   });
 
-  // TODO: Refactor error handlign
   if (!player) {
-    throw new NotFoundError('Player not found.');
+    return errored({ code: 'PLAYER_NOT_FOUND' });
   }
 
   if (player.annotations.some(a => a.type === PlayerAnnotationType.OPT_OUT)) {
-    throw new ForbiddenError('Player has opted out.');
+    return errored({ code: 'PLAYER_OPTED_OUT' });
   }
 
   let latestSnapshot = player.latestSnapshot;
@@ -71,7 +71,7 @@ async function findPlayerAchievementProgress(username: string): Promise<
   // Achievements that were once given, but are no longer valid (such as Base X stats Pre-Sailing)
   const legacyAchievements = achievements.filter(d => LEGACY_TEMPLATE_NAMES.includes(d.name));
 
-  return [
+  return complete([
     ...definitions.map((d, i) => {
       const prevDef = definitions[i - 1];
       const isFirstInCluster = i === 0 || prevDef.metric !== d.metric || prevDef.measure !== d.measure;
@@ -109,7 +109,7 @@ async function findPlayerAchievementProgress(username: string): Promise<
       absoluteProgress: 1,
       relativeProgress: 1
     }))
-  ];
+  ]);
 }
 
 function getAchievementStartValue(definition: AchievementDefinition) {

@@ -1,3 +1,4 @@
+import { AsyncResult, complete, errored } from '@attio/fetchable';
 import prisma, { PrismaTypes } from '../../../../prisma';
 import {
   Competition,
@@ -7,18 +8,18 @@ import {
   Participation,
   PlayerAnnotationType
 } from '../../../../types';
-import { ForbiddenError, NotFoundError } from '../../../errors';
 import { standardizeUsername } from '../../players/player.utils';
 
 async function findPlayerParticipations(
   username: string,
   status?: CompetitionStatus
-): Promise<
+): AsyncResult<
   Array<{
     participation: Participation;
     competition: Competition & { metrics: CompetitionMetric[]; participantCount: number };
     group: (Group & { memberCount: number }) | null;
-  }>
+  }>,
+  { code: 'PLAYER_NOT_FOUND' } | { code: 'PLAYER_OPTED_OUT' }
 > {
   const competitionQuery: PrismaTypes.CompetitionWhereInput = {
     visible: true
@@ -29,13 +30,12 @@ async function findPlayerParticipations(
     select: { id: true, annotations: true }
   });
 
-  // TODO: refactor error handling
   if (!player) {
-    throw new NotFoundError('Player not found.');
+    return errored({ code: 'PLAYER_NOT_FOUND' });
   }
 
   if (player.annotations.some(a => a.type === PlayerAnnotationType.OPT_OUT)) {
-    throw new ForbiddenError('Player as opted out');
+    return errored({ code: 'PLAYER_OPTED_OUT' });
   }
 
   if (status) {
@@ -102,34 +102,36 @@ async function findPlayerParticipations(
   const groupsMap = new Map(groups.map(g => [g.id, g]));
   const participantCountsMap = new Map(participantCounts.map(p => [p.competitionId, p._count]));
 
-  return sortCompetitions(
-    participations
-      .map(participation => {
-        const group = participation.competition.groupId
-          ? groupsMap.get(participation.competition.groupId)
-          : undefined;
+  return complete(
+    sortCompetitions(
+      participations
+        .map(participation => {
+          const group = participation.competition.groupId
+            ? groupsMap.get(participation.competition.groupId)
+            : undefined;
 
-        // If it's a group competition and the group is not found, then it probably
-        // means the group is not visible, and we should treat this competition as not visible as well.
-        if (participation.competition.groupId !== null && group === undefined) {
-          return null;
-        }
+          // If it's a group competition and the group is not found, then it probably
+          // means the group is not visible, and we should treat this competition as not visible as well.
+          if (participation.competition.groupId !== null && group === undefined) {
+            return null;
+          }
 
-        return {
-          participation,
-          competition: {
-            ...participation.competition,
-            participantCount: participantCountsMap.get(participation.competitionId) ?? 0
-          },
-          group: group
-            ? {
-                ...group,
-                memberCount: group._count.memberships
-              }
-            : null
-        };
-      })
-      .filter(Boolean)
+          return {
+            participation,
+            competition: {
+              ...participation.competition,
+              participantCount: participantCountsMap.get(participation.competitionId) ?? 0
+            },
+            group: group
+              ? {
+                  ...group,
+                  memberCount: group._count.memberships
+                }
+              : null
+          };
+        })
+        .filter(Boolean)
+    )
   );
 }
 

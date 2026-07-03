@@ -542,7 +542,18 @@ router.get(
 
     const participations = await findPlayerParticipations(username, status);
 
-    const response = participations.map(p => ({
+    if (isErrored(participations)) {
+      switch (participations.error.code) {
+        case 'PLAYER_NOT_FOUND':
+          throw new NotFoundErrorZ(participations.error);
+        case 'PLAYER_OPTED_OUT':
+          throw new ForbiddenErrorZ(participations.error);
+        default:
+          assertNever(participations.error);
+      }
+    }
+
+    const response = participations.value.map(p => ({
       ...formatParticipationResponse(p.participation),
       competition: formatCompetitionResponse(p.competition, p.group)
     }));
@@ -567,7 +578,18 @@ router.get(
 
     const standings = await findPlayerParticipationsStandings(username, status);
 
-    const response = standings.map(s =>
+    if (isErrored(standings)) {
+      switch (standings.error.code) {
+        case 'PLAYER_NOT_FOUND':
+          throw new NotFoundErrorZ(standings.error);
+        case 'PLAYER_OPTED_OUT':
+          throw new ForbiddenErrorZ(standings.error);
+        default:
+          assertNever(standings.error);
+      }
+    }
+
+    const response = standings.value.map(s =>
       formatPlayerCompetitionStandingResponse(
         s.participation,
         s.competition,
@@ -616,6 +638,18 @@ router.get(
     const { period, startDate, endDate } = req.query;
 
     const results = await findPlayerDeltas(username, period, startDate, endDate);
+
+    if (isErrored(results)) {
+      switch (results.error.code) {
+        case 'PLAYER_NOT_FOUND':
+          throw new NotFoundErrorZ(results.error);
+        case 'PLAYER_OPTED_OUT':
+          throw new ForbiddenErrorZ(results.error);
+        default:
+          assertNever(results.error);
+      }
+    }
+
     res.status(200).json(results);
   })
 );
@@ -653,7 +687,19 @@ router.get(
     const { username } = req.params;
 
     const achievements = await findPlayerAchievements(username);
-    const response = achievements.map(formatAchievementResponse);
+
+    if (isErrored(achievements)) {
+      switch (achievements.error.code) {
+        case 'PLAYER_NOT_FOUND':
+          throw new NotFoundErrorZ(achievements.error);
+        case 'PLAYER_OPTED_OUT':
+          throw new ForbiddenErrorZ(achievements.error);
+        default:
+          assertNever(achievements.error);
+      }
+    }
+
+    const response = achievements.value.map(formatAchievementResponse);
 
     res.status(200).json(response);
   })
@@ -670,7 +716,19 @@ router.get(
     const { username } = req.params;
 
     const achievements = await findPlayerAchievementProgress(username);
-    const response = achievements.map(formatAchievementProgressResponse);
+
+    if (isErrored(achievements)) {
+      switch (achievements.error.code) {
+        case 'PLAYER_NOT_FOUND':
+          throw new NotFoundErrorZ(achievements.error);
+        case 'PLAYER_OPTED_OUT':
+          throw new ForbiddenErrorZ(achievements.error);
+        default:
+          assertNever(achievements.error);
+      }
+    }
+
+    const response = achievements.value.map(formatAchievementProgressResponse);
 
     res.status(200).json(response);
   })

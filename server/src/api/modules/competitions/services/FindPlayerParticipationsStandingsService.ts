@@ -1,3 +1,4 @@
+import { AsyncResult, complete, errored } from '@attio/fetchable';
 import prisma from '../../../../prisma';
 import {
   Competition,
@@ -11,7 +12,6 @@ import { MetricDelta } from '../../../../types/metric-delta.type';
 import { calculateCompetitionDelta } from '../../../../utils/calculate-competition-delta.util';
 import { getRequiredSnapshotFields } from '../../../../utils/get-required-snapshot-fields.util';
 import { uniqueBy } from '../../../../utils/unique-by.util';
-import { ForbiddenError, NotFoundError } from '../../../errors';
 import { standardizeUsername } from '../../players/player.utils';
 
 type ReturnType = {
@@ -26,7 +26,7 @@ type ReturnType = {
 async function findPlayerParticipationsStandings(
   username: string,
   status: CompetitionStatus.ONGOING | CompetitionStatus.FINISHED
-): Promise<Array<ReturnType>> {
+): AsyncResult<Array<ReturnType>, { code: 'PLAYER_NOT_FOUND' } | { code: 'PLAYER_OPTED_OUT' }> {
   const player = await prisma.player.findFirst({
     where: {
       username: standardizeUsername(username)
@@ -35,11 +35,11 @@ async function findPlayerParticipationsStandings(
   });
 
   if (!player) {
-    throw new NotFoundError('Player not found.');
+    return errored({ code: 'PLAYER_NOT_FOUND' });
   }
 
-  if (player.annotations.some(a => a.type === PlayerAnnotationType.OPT_OUT)) {
-    throw new ForbiddenError('Player as opted out');
+  if (player.annotations?.some(a => a.type === PlayerAnnotationType.OPT_OUT)) {
+    return errored({ code: 'PLAYER_OPTED_OUT' });
   }
 
   const now = new Date();
@@ -78,7 +78,7 @@ async function findPlayerParticipationsStandings(
   });
 
   if (playerParticipations.length === 0) {
-    return [];
+    return complete([]);
   }
 
   // Find all other players in those same competitions
@@ -300,13 +300,15 @@ async function findPlayerParticipationsStandings(
     });
   }
 
-  return results.sort((a, b) => {
-    if (status === CompetitionStatus.FINISHED) {
-      return b.competition.endsAt.getTime() - a.competition.endsAt.getTime();
-    } else {
-      return a.competition.endsAt.getTime() - b.competition.endsAt.getTime();
-    }
-  });
+  return complete(
+    results.sort((a, b) => {
+      if (status === CompetitionStatus.FINISHED) {
+        return b.competition.endsAt.getTime() - a.competition.endsAt.getTime();
+      } else {
+        return a.competition.endsAt.getTime() - b.competition.endsAt.getTime();
+      }
+    })
+  );
 }
 
 function getSnapshotUniqueKey(playerId: number, createdAt: Date) {

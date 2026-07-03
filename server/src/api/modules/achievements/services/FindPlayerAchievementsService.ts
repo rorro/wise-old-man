@@ -1,9 +1,11 @@
+import { AsyncResult, complete, errored } from '@attio/fetchable';
 import prisma from '../../../../prisma';
 import { Achievement, PlayerAnnotationType } from '../../../../types';
-import { ForbiddenError, NotFoundError } from '../../../errors';
 import { standardizeUsername } from '../../players/player.utils';
 
-export async function findPlayerAchievements(username: string): Promise<Achievement[]> {
+export async function findPlayerAchievements(
+  username: string
+): AsyncResult<Achievement[], { code: 'PLAYER_NOT_FOUND' } | { code: 'PLAYER_OPTED_OUT' }> {
   const player = await prisma.player.findFirst({
     where: { username: standardizeUsername(username) },
     include: {
@@ -12,14 +14,13 @@ export async function findPlayerAchievements(username: string): Promise<Achievem
     }
   });
 
-  // TODO: Refactor error handlign
   if (!player) {
-    throw new NotFoundError('Player not found.');
+    return errored({ code: 'PLAYER_NOT_FOUND' });
   }
 
   if (player.annotations.some(a => a.type === PlayerAnnotationType.OPT_OUT)) {
-    throw new ForbiddenError('Player has opted out.');
+    return errored({ code: 'PLAYER_OPTED_OUT' });
   }
 
-  return player.achievements;
+  return complete(player.achievements);
 }
