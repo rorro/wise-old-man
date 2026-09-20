@@ -11,17 +11,12 @@ interface PlayerStanding {
 }
 
 export function useCompetitionTimeMachine() {
-  const { competition, previewMetric } = useCompetitionPageContext();
-  const competitionDetails24hAgo = useCompetitionDetails24hAgo(competition, previewMetric);
-
-  const metrics = useMemo(() => {
-    const competitionMetrics = competition.metrics.map((m) => m.metric);
-    return [...competitionMetrics, ...(previewMetric ? [previewMetric] : [])];
-  }, [competition.metrics, previewMetric]);
+  const { competition, effectiveMetrics } = useCompetitionPageContext();
+  const competitionDetails24hAgo = useCompetitionDetails24hAgo(competition, effectiveMetrics);
 
   const currentStandings = useMemo(
-    () => buildStandingsCache(metrics, competition),
-    [metrics, competition],
+    () => buildStandingsCache(effectiveMetrics, competition),
+    [effectiveMetrics, competition],
   );
 
   const previousStandings = useMemo(() => {
@@ -29,8 +24,8 @@ export function useCompetitionTimeMachine() {
       return undefined;
     }
 
-    return buildStandingsCache(metrics, competitionDetails24hAgo.data);
-  }, [metrics, competitionDetails24hAgo]);
+    return buildStandingsCache(effectiveMetrics, competitionDetails24hAgo.data);
+  }, [effectiveMetrics, competitionDetails24hAgo]);
 
   // The 24h-ago snapshot only covers a subset of the participants, so rank movement has to be
   // measured within that subset. Comparing a rank among 50 players against a rank among all of
@@ -95,7 +90,10 @@ export function useCompetitionTimeMachine() {
   };
 }
 
-function useCompetitionDetails24hAgo(competition: CompetitionDetailsResponse, previewMetric?: Metric) {
+function useCompetitionDetails24hAgo(
+  competition: CompetitionDetailsResponse,
+  effectiveMetrics?: Array<Metric>,
+) {
   const client = useWOMClient();
 
   const activeParticipantUsernames = useMemo(() => {
@@ -111,7 +109,7 @@ function useCompetitionDetails24hAgo(competition: CompetitionDetailsResponse, pr
   const isEnabled = !startedWithinLast24h && activeParticipantUsernames.length > 0;
 
   return useQuery({
-    queryKey: ["competition-time-machine", competition.id, previewMetric],
+    queryKey: ["competition-time-machine", competition.id, effectiveMetrics?.join(",")],
     queryFn: async () => {
       const params = new URLSearchParams();
 
@@ -121,8 +119,10 @@ function useCompetitionDetails24hAgo(competition: CompetitionDetailsResponse, pr
         params.append("usernames", username);
       }
 
-      if (previewMetric) {
-        params.set("metric", previewMetric);
+      if (effectiveMetrics !== undefined) {
+        for (const metric of effectiveMetrics) {
+          params.append("metrics", metric);
+        }
       }
 
       return client.getRequest<CompetitionDetailsResponse>(
